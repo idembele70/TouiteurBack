@@ -1,0 +1,2 @@
+# TouiteurBack
+ The goal of this project is to create a Node.js server in TypeScript capable of managing the following functionalities: posting, reading, and deleting tweets, registering and authenticating users, as well as managing their profiles. The server should be able to store data in a database and ensure the security of transactions through encryption and authentication protocols. Unit and integration tests should be put in place to ensure the quality of the produced code.
