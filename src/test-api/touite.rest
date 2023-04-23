@@ -1,0 +1,8 @@
+### Add one touite
+POST http://localhost:5000/touites/new
+Content-Type: application/json
+
+{
+  "author":"playmakers",
+  "text":"'Just saw a bird fly by!',"
+}
