@@ -1,8 +1,27 @@
+### To use it, you will need to install the "humao.rest-client" extension created by Huachao Mao.
+
 ### Add one touite
 POST http://localhost:5000/touites/new
 Content-Type: application/json
 
 {
-  "author":"playmakers",
-  "text":"'Just saw a bird fly by!',"
+  "author":"toto",
+  "text":"Hi, It's toto !!!!"
 }
+
+### Delete one touite
+DELETE  http://localhost:5000/touites/64464bad67564a2eff00209d
+
+### Update one touite
+PUT http://localhost:5000/touites/644657eb250aa51f39956082
+Content-Type: application/json
+
+{
+"text": "Hi, It's toto's second text updated !"
+}
+
+### Get one touite
+Get http://localhost:5000/touites/644657eb250aa51f39956082
+
+### Get all touite
+Get http://localhost:5000/touites/

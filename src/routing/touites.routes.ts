@@ -1,9 +1,12 @@
 import { Router } from 'express'
-import { addOneTouite, getTouites } from '../controllers/touites.controllers'
+import { addOneTouite, deleteOneTouite, getOneTouite, getAllTouites, updateOneTouite } from '../controllers/touites.controllers'
 const touiteRouter = Router()
 
 
 touiteRouter.post("/new", addOneTouite)
-touiteRouter.get("/", getTouites)
+touiteRouter.delete("/:id", deleteOneTouite)
+touiteRouter.put("/:id", updateOneTouite)
+touiteRouter.get("/:id", getOneTouite)
+touiteRouter.get("/", getAllTouites)
 
 export default touiteRouter

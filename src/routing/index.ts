@@ -1,7 +1,9 @@
 import { Router } from 'express'
-import touiteRouter from './touites.routes'
+import touitesRouter from './touites.routes'
+import usersRouter from './users.routes'
 const router = Router()
 
-router.use("/touites", touiteRouter)
+router.use("/touites", touitesRouter)
+router.use("/user", usersRouter)
 
 export default router
