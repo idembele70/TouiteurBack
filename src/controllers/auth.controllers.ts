@@ -1,43 +1,72 @@
 import Touite, { TouiteProps } from '../database/models/touite.model';
 import { Request, Response } from "express"
-import { UserProps, UserReqBody, createOneUser, getUserByEmailOrUsername } from '../database/models/users.model';
-import { authentification, random } from '../services';
-import crypto from "crypto"
-import { BAD_REQUEST, HTTP_FORBIDDEN, INTERNAL_SERVER_ERROR, OK } from '../services/constants';
+import User, { UserProps, createOneUser } from '../database/models/users.model';
+import jwt from 'jsonwebtoken'
+import CryptoJS from "crypto-js"
+import { BAD_REQUEST, HTTP_FORBIDDEN, INTERNAL_SERVER_ERROR, OK, UNAUTHORIZED } from '../services/constants';
+
+
+// Register
+const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
+  const { PASSWORD_SECRET_KEY } = process.env
+  try {
+    const { password, ...others } = req.body
+    const existingUser = await getUserByEmailOrUsername(others)
+    if (existingUser)
+      return res.status(UNAUTHORIZED).json(({
+        file: "auth.controllers.ts/register",
+        error: `A user with ${others.email === existingUser.email ? 'that email' : 'that username'} already exists`
+      }))
+
+    const cryptedPassword = CryptoJS.AES.encrypt(
+      password, PASSWORD_SECRET_KEY
+    ).toString()
+    const newUser = new User({
+      ...others, password: cryptedPassword
+    })
+    const savedUser = await newUser.save()
+    return res.status(OK).json(savedUser)
+
+  } catch (error) {
+    return res.status(INTERNAL_SERVER_ERROR).json({
+      file: "auth.controllers.ts/register",
+      error,
+      message: "Catch block error"
+    })
+  }
+}
+
 
 // Login
-const login = async (req: Request<{}, {}, UserReqBody>, res: Response) => {
+const login = async (req: Request<{}, {}, UserProps>, res: Response) => {
+  const { PASSWORD_SECRET_KEY, JWT_SECRET_KEY } = process.env
+
   try {
-    const { password, email } = req.body
-    if (!email || !password) {
-      return res.status(BAD_REQUEST).json({
-        error: "Please provide values for all required fields: email and password",
-      })
-    }
-    const user = await getUserByEmailOrUsername({ email })
-      .select("+authentification.salt +authentification.password")
-    if (!user) {
-      return res.status(BAD_REQUEST).json({
-        file: "auth.controllers.ts/login",
-        error: `A user with that email doesn't exists`
-      })
-    }
-    const expectedPasswordHash = authentification(user.authentification.salt, password)
-    if (user.authentification.password !== expectedPasswordHash) {
+    const { password, ...others } = req.body
+    const user = await getUserByEmailOrUsername(others).select("password")
+    if (!user) return res.status(BAD_REQUEST).json({
+      file: "auth.controllers.ts/login",
+      error: `A user with that email or username doesn't exists`,
+      location: "if(!user)"
+    })
+    const userPassword = CryptoJS.AES.decrypt(
+      user.password, PASSWORD_SECRET_KEY
+    ).toString(CryptoJS.enc.Utf8)
+    if (password !== userPassword)
       return res.status(HTTP_FORBIDDEN).json({
         file: "auth.controllers.ts/login",
-        error: `Invalid email or password`
+        error: `Invalid password`
       })
-    }
-    const salt = random()
-    user.authentification.sessionToken = authentification(salt, user._id.toString())
-    await user.save();
-    const { COOKIE_SECRET_KEY, COOKIE_DOMAIN } = process.env
-    res.cookie(COOKIE_SECRET_KEY, user.authentification.sessionToken, {
-      domain: COOKIE_DOMAIN,
-      path: "/"
+    const accessToken = jwt.sign(
+      { id: user._id }, JWT_SECRET_KEY, { expiresIn: "1d" }
+    )
+    const { exp } = jwt.decode(accessToken) as { exp: number }
+    return res.status(OK).json({
+      id: user._id,
+      ...others,
+      accessToken,
+      exp
     })
-    return res.status(OK).json(user)
   } catch (error) {
     return res.status(INTERNAL_SERVER_ERROR).json({
       file: "auth.controllers.ts/login",
@@ -45,42 +74,12 @@ const login = async (req: Request<{}, {}, UserReqBody>, res: Response) => {
     })
   }
 }
-
-// Register
-const register = async (req: Request<{}, {}, UserReqBody>, res: Response) => {
-
-  try {
-    const { email, password, username } = req.body
-    if (!email || !password || !username) {
-      return res.status(BAD_REQUEST).json({
-        file: "auth.controllers.ts/register",
-        error: "Please provide values for all required fields: email, password, and username",
-      })
-    }
-    const existingUser = await getUserByEmailOrUsername({ email, username })
-    if (existingUser) {
-      return res.status(BAD_REQUEST).json({
-        file: "auth.controllers.ts/register",
-        error: `A user with ${email ? 'that email' : 'that username'} already exists`
-      })
-    }
-    const salt = random()
-    const registeredUser = await createOneUser({
-      email,
-      username,
-      authentification: {
-        salt,
-        password: authentification(salt, password)
-      }
-    })
-    return res.status(OK).json(registeredUser)
-  } catch (error) {
-    return res.status(INTERNAL_SERVER_ERROR).json({
-      file: "auth.controllers.ts/register",
-      error
-    })
+const getUserByEmailOrUsername = ({ email, username }: { email?: string; username?: string }) => User.findOne(
+  {
+    $or: [{ email }, { username }]
   }
-}
+)
+
 
 export {
   login,

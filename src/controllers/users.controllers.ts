@@ -1,7 +1,8 @@
 import Touite, { TouiteProps } from '../database/models/touite.model';
 import { Request, Response } from "express"
-import User from '../database/models/users.model';
+import User, { getUsers } from '../database/models/users.model';
 import { ReqParams } from './touites.controllers';
+import { BAD_REQUEST, INTERNAL_SERVER_ERROR, OK } from '../services/constants';
 
 // Create a new User
 const addOneUser = async function (req: Request<{}, {}, TouiteProps>, res: Response) {
@@ -34,10 +35,10 @@ const getOneUserByEmail = async function (req: Request<ReqParams>, res: Response
 // Get all users
 const getAllUsers = async function (req: Request, res: Response) {
   try {
-    const Users = await User.find({})
-    return res.status(OK).json(Users)
+    const users = await getUsers()
+    return res.status(OK).json(users)
   } catch (error) {
-    return res.status(INTERNAL_SERVER_ERROR).json({
+    return res.status(BAD_REQUEST).json({
       file: "Users.controllers.ts/getAllUsers",
       error
     })

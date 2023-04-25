@@ -1,14 +1,10 @@
 import { Schema, model } from 'mongoose'
 
 
-export interface UserProps {
+interface UserProps {
   username: string,
   email: string;
-  authentification: {
-    password: string;
-    salt: string;
-    sessionToken?: string
-  }
+  password: string;
 }
 
 const UserSchema = new Schema<UserProps>({
@@ -22,48 +18,27 @@ const UserSchema = new Schema<UserProps>({
     required: true,
     unique: true
   },
-  authentification: {
-    password: {
-      type: String,
-      required: true,
-      select: false
-    },
-    salt: {
-      type: String,
-      select: false
-    },
-    sessionToken: {
-      type: String,
-      select: false
-    },
-  }
+  password: {
+    type: String,
+    required: true,
+    select: false
+  },
 })
 
 const User = model("User", UserSchema)
 
-// user CRUD
+// User Functions
 
-const getUserByEmailOrUsername = ({ email, username }: { email?: string; username?: string }) => User.findOne(
-  {
-    $or: [{ email }, { username }]
-  }
-)
-const getUserBySessionToken = (sessionToken: string) =>
-  User.findOne({
-    "authentification.sessionToken": sessionToken
-  })
+const getUsers = () => User.find()
+
+
 const getOneUserById = (id: string) => User.findById(id)
-interface UserReqBody {
-  username: string,
-  email: string;
-  password: string;
-}
 const createOneUser = (values: UserProps) => new User(values)
   .save().then(
-    user => user.toObject()
+    (user) => user.toObject()
   )
 const deleteUser = (id: string) => User.findByIdAndDelete(id)
-const updateUser = (id: string, values: UserReqBody) =>
+const updateUser = (id: string, values: UserProps) =>
   User.findByIdAndUpdate(
     id, {
     $set: { ...values }
@@ -76,9 +51,8 @@ const updateUser = (id: string, values: UserReqBody) =>
 export default User
 
 export {
-  UserReqBody,
-  getUserByEmailOrUsername,
-  getUserBySessionToken,
+  UserProps,
+  getUsers,
   getOneUserById,
   createOneUser,
   deleteUser,
