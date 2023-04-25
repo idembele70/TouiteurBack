@@ -1,2 +1,9 @@
 MONGO_URL=value
 PORT=value
+RANDOM_BYTES=value
+CRYPTO_BASE=value
+HMAC=value
+PASSWORD_SECRET_KEY=value
+DIGEST=value
+COOKIE_SECRET_KEY=value
+COOKIE_DOMAIN=value

@@ -1,0 +1,14 @@
+
+const OK = 200
+const BAD_REQUEST = 400
+const HTTP_FORBIDDEN = 403
+const INTERNAL_SERVER_ERROR = 500
+
+
+
+export {
+  OK,
+  BAD_REQUEST,
+  HTTP_FORBIDDEN,
+  INTERNAL_SERVER_ERROR,
+}
