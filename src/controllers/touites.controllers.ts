@@ -1,4 +1,4 @@
-import { INTERNAL_SERVER_ERROR, OK } from '../services/constants';
+import { StatusCodes } from 'http-status-codes';
 import Touite, { TouiteProps } from './../database/models/touite.model';
 import { Request, Response } from "express"
 
@@ -7,9 +7,9 @@ const addOneTouite = async function (req: Request<{}, {}, TouiteProps>, res: Res
   const newTweet = new Touite(req.body)
   try {
     const savedTweet = await newTweet.save()
-    res.status(OK).json(savedTweet)
+    res.status(StatusCodes.OK).json(savedTweet)
   } catch (error) {
-    return res.status(INTERNAL_SERVER_ERROR).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       file: "touites.controllers.ts/addOneTouite",
       error
     })
@@ -18,15 +18,15 @@ const addOneTouite = async function (req: Request<{}, {}, TouiteProps>, res: Res
 
 // Delete a touite
 export interface ReqParams {
-  id: string
+  id?: string
 }
 const deleteOneTouite = async function (req: Request<ReqParams>, res: Response) {
   const { id } = req.params
   try {
     await Touite.findByIdAndDelete(id)
-    return res.status(OK).json("Touite deleted!!")
+    return res.status(StatusCodes.OK).json("Touite deleted!!")
   } catch (error) {
-    return res.status(INTERNAL_SERVER_ERROR).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       file: "touites.controllers.ts/deleteOneTouite",
       error
     })
@@ -41,9 +41,9 @@ const updateOneTouite = async function (req: Request<ReqParams, {}, TouiteProps>
       {
         $set: { text }
       }, { new: true, })
-    return res.status(OK).json(touiteUpdated)
+    return res.status(StatusCodes.OK).json(touiteUpdated)
   } catch (error) {
-    return res.status(INTERNAL_SERVER_ERROR).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       file: "touites.controllers.ts/updateOneTouite",
       error
     })
@@ -56,9 +56,9 @@ const getOneTouite = async function (req: Request<ReqParams>, res: Response) {
   const { id } = req.params
   try {
     const touite = await Touite.findById(id)
-    return res.status(OK).json(touite)
+    return res.status(StatusCodes.OK).json(touite)
   } catch (error) {
-    return res.status(INTERNAL_SERVER_ERROR).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       file: "touites.controllers.ts/getOneTouite",
       error
     })
@@ -68,9 +68,9 @@ const getOneTouite = async function (req: Request<ReqParams>, res: Response) {
 const getAllTouites = async function (req: Request, res: Response) {
   try {
     const touites = await Touite.find({})
-    return res.status(OK).json(touites)
+    return res.status(StatusCodes.OK).json(touites)
   } catch (error) {
-    return res.status(INTERNAL_SERVER_ERROR).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       file: "touites.controllers.ts/getAllTouites",
       error
     })

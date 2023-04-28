@@ -1,2 +1,30 @@
-### GET
+
+
+### GET all users
+### Admin
 GET http://localhost:5000/users
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NDk1MmM1Y2FlNzE0MDNlNjM5MzQ3ZSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTY4MjY3ODU4MiwiZXhwIjoxNjgyNzY0OTgyfQ.NbZrjU0EP20aYqQh1bYZChsvMKR06K-ZAi3-U1LMFEg
+### Not admin
+GET http://localhost:5000/users
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NDkwMmFiNzZjZjE1NWY2MjcwZGM0MCIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2ODI2Nzg3MTEsImV4cCI6MTY4Mjc2NTExMX0.rOjn8dmTB-VApWrIJk1Xnhp0mO1jOhRwImT4Ob739A8
+
+### GET one user
+GET http://localhost:5000/users/644952c5cae71403e639347e
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NDk1MmM1Y2FlNzE0MDNlNjM5MzQ3ZSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTY4MjY3ODU4MiwiZXhwIjoxNjgyNzY0OTgyfQ.NbZrjU0EP20aYqQh1bYZChsvMKR06K-ZAi3-U1LMFEg
+### UPDATE all user
+PUT  http://localhost:5000/users/
+Content-Type: application/json
+
+{
+  "isAdmin": false
+}
+
+### UPDATE one user
+PUT  http://localhost:5000/users/644809779faece5a1011f07c
+Content-Type: application/json
+
+{
+  "username": "exmama-momo",
+  "email": "exmama-momo@mail.fr"
+}
+

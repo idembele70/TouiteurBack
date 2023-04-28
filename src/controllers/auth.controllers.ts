@@ -1,9 +1,9 @@
 import Touite, { TouiteProps } from '../database/models/touite.model';
 import { Request, Response } from "express"
-import User, { UserProps, createOneUser } from '../database/models/users.model';
+import User, { UserProps } from '../database/models/users.model';
 import jwt from 'jsonwebtoken'
 import CryptoJS from "crypto-js"
-import { BAD_REQUEST, HTTP_FORBIDDEN, INTERNAL_SERVER_ERROR, OK, UNAUTHORIZED } from '../services/constants';
+import { StatusCodes } from 'http-status-codes';
 
 
 // Register
@@ -13,7 +13,7 @@ const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
     const { password, ...others } = req.body
     const existingUser = await getUserByEmailOrUsername(others)
     if (existingUser)
-      return res.status(UNAUTHORIZED).json(({
+      return res.status(StatusCodes.UNAUTHORIZED).json(({
         file: "auth.controllers.ts/register",
         error: `A user with ${others.email === existingUser.email ? 'that email' : 'that username'} already exists`
       }))
@@ -25,10 +25,10 @@ const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
       ...others, password: cryptedPassword
     })
     const savedUser = await newUser.save()
-    return res.status(OK).json(savedUser)
+    return res.status(StatusCodes.OK).json(savedUser)
 
   } catch (error) {
-    return res.status(INTERNAL_SERVER_ERROR).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       file: "auth.controllers.ts/register",
       error,
       message: "Catch block error"
@@ -42,33 +42,36 @@ const login = async (req: Request<{}, {}, UserProps>, res: Response) => {
   const { PASSWORD_SECRET_KEY, JWT_SECRET_KEY } = process.env
 
   try {
-    const { password, ...others } = req.body
-    const user = await getUserByEmailOrUsername(others).select("password")
-    if (!user) return res.status(BAD_REQUEST).json({
+    const { password, ...emailOrUsername } = req.body
+    const user = await getUserByEmailOrUsername(emailOrUsername).select("+password")
+    if (!user) return res.status(StatusCodes.BAD_REQUEST).json({
       file: "auth.controllers.ts/login",
       error: `A user with that email or username doesn't exists`,
       location: "if(!user)"
     })
+    const { password: DBPassword, isAdmin, username, email } = user
     const userPassword = CryptoJS.AES.decrypt(
-      user.password, PASSWORD_SECRET_KEY
+      DBPassword, PASSWORD_SECRET_KEY
     ).toString(CryptoJS.enc.Utf8)
     if (password !== userPassword)
-      return res.status(HTTP_FORBIDDEN).json({
+      return res.status(StatusCodes.FORBIDDEN).json({
         file: "auth.controllers.ts/login",
         error: `Invalid password`
       })
     const accessToken = jwt.sign(
-      { id: user._id }, JWT_SECRET_KEY, { expiresIn: "1d" }
+      { id: user._id, isAdmin }, JWT_SECRET_KEY, { expiresIn: "1d" }
     )
     const { exp } = jwt.decode(accessToken) as { exp: number }
-    return res.status(OK).json({
+    return res.status(StatusCodes.OK).json({
       id: user._id,
-      ...others,
+      email,
+      username,
+      isAdmin,
       accessToken,
       exp
     })
   } catch (error) {
-    return res.status(INTERNAL_SERVER_ERROR).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       file: "auth.controllers.ts/login",
       error
     })

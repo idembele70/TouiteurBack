@@ -5,6 +5,7 @@ interface UserProps {
   username: string,
   email: string;
   password: string;
+  isAdmin: boolean;
 }
 
 const UserSchema = new Schema<UserProps>({
@@ -23,38 +24,17 @@ const UserSchema = new Schema<UserProps>({
     required: true,
     select: false
   },
-})
+  isAdmin: {
+    type: Boolean,
+    required: false,
+    default: false,
+  }
+}, { timestamps: true })
 
 const User = model("User", UserSchema)
-
-// User Functions
-
-const getUsers = () => User.find()
-
-
-const getOneUserById = (id: string) => User.findById(id)
-const createOneUser = (values: UserProps) => new User(values)
-  .save().then(
-    (user) => user.toObject()
-  )
-const deleteUser = (id: string) => User.findByIdAndDelete(id)
-const updateUser = (id: string, values: UserProps) =>
-  User.findByIdAndUpdate(
-    id, {
-    $set: { ...values }
-  },
-    {
-      new: true
-    }
-  )
 
 export default User
 
 export {
   UserProps,
-  getUsers,
-  getOneUserById,
-  createOneUser,
-  deleteUser,
-  updateUser,
 }

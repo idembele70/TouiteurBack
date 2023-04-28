@@ -1,9 +1,15 @@
 import { Router } from 'express'
-import { getAllUsers } from '../controllers/users.controllers'
+import { getAllUsers, getOneUser, updateAllUsers, updateOneUser } from '../controllers/users.controllers'
+import { verifyTokenAndAdmin, verifyTokenAndAuthorization } from '../services/verifyToken'
 
 const router = Router()
 
-router.get("/", [], getAllUsers)
+// Admin Routes
+router.get("/", [verifyTokenAndAdmin], getAllUsers)
+router.put("/", [verifyTokenAndAdmin], updateAllUsers)
+// Users Routes
+router.get("/:id", [verifyTokenAndAuthorization], getOneUser)
+router.put("/:id", [verifyTokenAndAuthorization], updateOneUser)
 // Add a user
 
 export default router

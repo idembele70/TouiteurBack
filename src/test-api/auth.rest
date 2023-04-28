@@ -4,16 +4,26 @@ POST http://localhost:5000/auth/register
 Content-Type: application/json
 
 {
-  "username":"boubou",
-  "email":"boubou@mail.fr",
-  "password":"boubou"
+  "username":"popo",
+  "email":"popo@mail.fr",
+  "password":"popo"
 }
 ### Login
 
+###Admin user
 POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 { 
-  "username":"toto",
-  "password":"toto"
+  "username":"popo",
+  "password":"popo"
+}
+
+###Not admin user
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{ 
+  "username":"titi",
+  "password":"titi"
 }

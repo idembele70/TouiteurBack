@@ -1,0 +1,16 @@
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 294
+ETag: W/"126-6ppZWwXZyD7jM0VAsxOpSbxSOcg"
+Date: Fri, 28 Apr 2023 10:07:04 GMT
+Connection: close
+
+{
+"id":"644952c5cae71403e639347e",
+"email":"popo@mail.fr",
+"username":"popo",
+"isAdmin":true,
+"accessToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NDk1MmM1Y2FlNzE0MDNlNjM5MzQ3ZSIsImlhdCI6MTY4MjY3NjQyNCwiZXhwIjoxNjgyNzYyODI0fQ.WOjDQxExpwxB3Hd1u4okw_F7LMyHgfDAd_rcL_e2cy0",
+"exp":1682762824
+}

@@ -1,55 +1,78 @@
-import Touite, { TouiteProps } from '../database/models/touite.model';
-import { Request, Response } from "express"
-import User, { getUsers } from '../database/models/users.model';
+import { Request, Response } from "express";
+import User, { UserProps } from '../database/models/users.model';
+
 import { ReqParams } from './touites.controllers';
-import { BAD_REQUEST, INTERNAL_SERVER_ERROR, OK } from '../services/constants';
+import { StatusCodes } from "http-status-codes";
 
-// Create a new User
-const addOneUser = async function (req: Request<{}, {}, TouiteProps>, res: Response) {
-
-}
-
-// Delete a user
-const deleteOneUser = async function (req: Request<ReqParams>, res: Response) {
-
-}
-// Update a user
-const updateOneUser = async function (req: Request<ReqParams, {}, TouiteProps>, res: Response) {
-
-}
-
-
-// Get one user
-const getOneUserByEmail = async function (req: Request<ReqParams>, res: Response) {
-  const { id } = req.params
+// Get a user 
+const getOneUser = async (req: Request<ReqParams>, res: Response) => {
   try {
-    const touite = await Touite.findById(id)
-    return res.status(OK).json(touite)
+    const user = await User.findById(req.params.id)
+    if (!user)
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "User not found",
+        location: "Users.controllers.ts/getOneUser",
+      });
+    return res.status(StatusCodes.OK).json(user)
   } catch (error) {
-    return res.status(INTERNAL_SERVER_ERROR).json({
-      file: "touites.controllers.ts/getOneTouite",
-      error
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Failed to get user",
+      error,
+      location: "Users.controllers.ts/getOneUser",
     })
   }
 }
+// Update a user
+const updateOneUser = async function (req: Request<ReqParams, {}, UserProps>, res: Response) {
+  try {
+    const { id } = req.params
+    const updatedUser = await User.findByIdAndUpdate(
+      id, {
+      $set: { ...req.body }
+    }, {
+      new: true
+    }
+    )
+    return res.status(StatusCodes.OK).json(updatedUser)
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Failed to update user",
+      error,
+      location: "Users.controllers.ts/updateOneUser",
+    })
+  }
+}
+
+// Update field from all users
+const updateAllUsers = async function (req: Request<never, never, UserProps>, res: Response) {
+  try {
+    const updatedUsers = await User.updateMany(
+      {}, { ...req.body }, { new: true }
+    )
+    return res.status(StatusCodes.OK).json(updatedUsers)
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Failed to update users",
+      error,
+      location: "Users.controllers.ts/updateAllUser",
+    })
+  }
+}
+
 // Get all users
 const getAllUsers = async function (req: Request, res: Response) {
   try {
-    const users = await getUsers()
-    return res.status(OK).json(users)
+    const users = await User.find()
+    return res.status(StatusCodes.OK).json(users)
   } catch (error) {
-    return res.status(BAD_REQUEST).json({
-      file: "Users.controllers.ts/getAllUsers",
-      error
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Failed to retrieve users",
+      error,
+      location: "Users.controllers.ts/getAllUsers",
     })
   }
 }
 
 
-export {
-  addOneUser,
-  deleteOneUser,
-  updateOneUser,
-  getOneUserByEmail,
-  getAllUsers
-}
+export { getOneUser, updateOneUser, updateAllUsers, getAllUsers, };
+
