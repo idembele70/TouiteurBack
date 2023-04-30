@@ -25,8 +25,14 @@ const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
       ...others, password: cryptedPassword
     })
     const savedUser = await newUser.save()
-    return res.status(StatusCodes.OK).json(savedUser)
-
+    if (!savedUser)
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
+        {
+          file: "auth.controllers.ts/register",
+          message: "Error while trying to save the user"
+        }
+      )
+    return res.status(StatusCodes.OK).json({ message: "Your account is created.", username: savedUser.username })
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       file: "auth.controllers.ts/register",
@@ -40,14 +46,12 @@ const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
 // Login
 const login = async (req: Request<{}, {}, UserProps>, res: Response) => {
   const { PASSWORD_SECRET_KEY, JWT_SECRET_KEY } = process.env
-
   try {
     const { password, ...emailOrUsername } = req.body
     const user = await getUserByEmailOrUsername(emailOrUsername).select("+password")
     if (!user) return res.status(StatusCodes.BAD_REQUEST).json({
       file: "auth.controllers.ts/login",
       error: `A user with that email or username doesn't exists`,
-      location: "if(!user)"
     })
     const { password: DBPassword, isAdmin, username, email } = user
     const userPassword = CryptoJS.AES.decrypt(
@@ -56,7 +60,7 @@ const login = async (req: Request<{}, {}, UserProps>, res: Response) => {
     if (password !== userPassword)
       return res.status(StatusCodes.FORBIDDEN).json({
         file: "auth.controllers.ts/login",
-        error: `Invalid password`
+        error: `Invalid password`,
       })
     const accessToken = jwt.sign(
       { id: user._id, isAdmin }, JWT_SECRET_KEY, { expiresIn: "1d" }

@@ -1,8 +1,8 @@
-import { Schema, model } from "mongoose";
+import { ObjectId, Schema, model } from "mongoose";
 
-export interface TouiteProps {
+export interface TouiteProps extends Document {
   text: string;
-  author: string;
+  author: ObjectId;
 }
 
 const TouiteSchema = new Schema<TouiteProps>({
@@ -11,8 +11,9 @@ const TouiteSchema = new Schema<TouiteProps>({
     required: true,
   },
   author: {
-    type: String,
-    required: true
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "User"
   }
 },
   {
@@ -23,6 +24,6 @@ const TouiteSchema = new Schema<TouiteProps>({
   }
 );
 
-const Touite = model("touite", TouiteSchema)
+const Touite = model<TouiteProps>("Touite", TouiteSchema)
 
 export default Touite

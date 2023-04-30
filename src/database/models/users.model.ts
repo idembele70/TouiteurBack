@@ -1,11 +1,13 @@
+import { Document } from 'mongoose';
 import { Schema, model } from 'mongoose'
 
 
-interface UserProps {
-  username: string,
+interface UserProps extends Document {
+  username: string;
   email: string;
   password: string;
   isAdmin: boolean;
+
 }
 
 const UserSchema = new Schema<UserProps>({
@@ -31,7 +33,7 @@ const UserSchema = new Schema<UserProps>({
   }
 }, { timestamps: true })
 
-const User = model("User", UserSchema)
+const User = model<UserProps>("User", UserSchema)
 
 export default User
 

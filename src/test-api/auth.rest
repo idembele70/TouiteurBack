@@ -4,9 +4,9 @@ POST http://localhost:5000/auth/register
 Content-Type: application/json
 
 {
-  "username":"popo",
-  "email":"popo@mail.fr",
-  "password":"popo"
+  "username":"admin",
+  "email":"admin@mail.fr",
+  "password":"admin"
 }
 ### Login
 
@@ -15,8 +15,8 @@ POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 { 
-  "username":"popo",
-  "password":"popo"
+  "username":"admin",
+  "password":"admin"
 }
 
 ###Not admin user
@@ -26,4 +26,12 @@ Content-Type: application/json
 { 
   "username":"titi",
   "password":"titi"
+}
+### user 2
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{ 
+  "username":"pierre",
+  "password":"pierre"
 }

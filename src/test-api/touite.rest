@@ -1,19 +1,21 @@
 ### To use it, you will need to install the "humao.rest-client" extension created by Huachao Mao.
 
 ### Add one touite
-POST http://localhost:5000/touites/new
+POST http://localhost:5000/touites/new/644ed130427b3b0b260bac97
+Authorization: bearear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NGVkMTMwNDI3YjNiMGIyNjBiYWM5NyIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2ODI4ODc1MTIsImV4cCI6MTY4Mjk3MzkxMn0.2m6F0CYNC-D7RburZWErZ9cDIS1ug-EUpMWUtrSt2gM
 Content-Type: application/json
 
 {
-  "author":"toto",
-  "text":"Hi, It's toto !!!!"
+  "text":"This is a tweet from titi, my first one."
 }
 
 ### Delete one touite
-DELETE  http://localhost:5000/touites/64464bad67564a2eff00209d
+DELETE  http://localhost:5000/touites/644ed9804abdafa279bf9d22/
+Authorization: bearear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NGVkMTMwNDI3YjNiMGIyNjBiYWM5NyIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2ODI4ODc1MTIsImV4cCI6MTY4Mjk3MzkxMn0.2m6F0CYNC-D7RburZWErZ9cDIS1ug-EUpMWUtrSt2gM
 
 ### Update one touite
-PUT http://localhost:5000/touites/644657eb250aa51f39956082
+PUT http://localhost:5000/touites/
+Authorization: bearear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NDQ5MDI1Njc2Y2YxNTVmNjI3MGRjM2QiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNjgyODgyMTEwLCJleHAiOjE2ODI5Njg1MTB9.gP145KI8MZcQGS5yPhB2VN1SUXBF42smAms79g-liNM
 Content-Type: application/json
 
 {
@@ -21,7 +23,13 @@ Content-Type: application/json
 }
 
 ### Get one touite
-Get http://localhost:5000/touites/644657eb250aa51f39956082
-
-### Get all touite
 Get http://localhost:5000/touites/
+
+### Get all touites
+Get http://localhost:5000/touites/findAll/644ed1b568703df6e8b0cc53
+Authorization: bearear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NGVkMWI1Njg3MDNkZjZlOGIwY2M1MyIsImlzQWRtaW4iOnRydWUsImlhdCI6MTY4Mjg4NzQ5MCwiZXhwIjoxNjgyOTczODkwfQ.lBtRNuNhEcOFxJvvaeL30PUi-y3OALH8UEg_KmYlymM
+
+### Delete all touites
+
+DELETE http://localhost:5000/touites/deleteAll/644952c5cae71403e639347e
+Authorization: bearear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NDQ5NTJjNWNhZTcxNDAzZTYzOTM0N2UiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE2ODI4ODQxNjUsImV4cCI6MTY4Mjk3MDU2NX0.aU3AcFTvNPkxQvaWs_MzUlpQSDEKHo1r205HgdoTm_4

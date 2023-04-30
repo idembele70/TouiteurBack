@@ -1,4 +1,4 @@
-import { UserJwtPayload } from './express.d';
+import { UserJwtPayload } from './express';
 import { JwtPayload } from "jsonwebtoken";
 
 declare global {
