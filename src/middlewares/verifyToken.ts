@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { UserJwtPayload } from '../types/express';
 import { StatusCodes } from 'http-status-codes';
+import Touite from '../database/models/touite.model';
 
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers["authorization"]?.split(" ")[1]
@@ -24,7 +25,7 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
 const verifyTokenAndAuthorization = (req: Request, res: Response, next: NextFunction) => {
   verifyToken(req, res, () => {
     const { user } = req
-    if (user && (user?.id === req.params.userId || user?.isAdmin)) {
+    if (user && (user.id === req.params.id || user?.isAdmin)) {
       return next()
     }
     return res.status(StatusCodes.FORBIDDEN).json("You are not authorized to perform this action")
@@ -32,7 +33,6 @@ const verifyTokenAndAuthorization = (req: Request, res: Response, next: NextFunc
 }
 
 const verifyTokenAndAdmin = (req: Request, res: Response, next: NextFunction) => {
-  console.log("in there")
   verifyToken(req, res, () => {
     const { user } = req
     if (user && user.isAdmin) {
@@ -41,10 +41,29 @@ const verifyTokenAndAdmin = (req: Request, res: Response, next: NextFunction) =>
     return res.status(StatusCodes.FORBIDDEN).json("You must be an admin to perform this action")
   })
 }
+const verifyTokenAndTouiteAuthorization = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const touite = await Touite.findById(req.params.id)
+    if (!touite)
+      return res.status(StatusCodes.NOT_FOUND).json("No tweet found in the DB.")
+    verifyToken(req, res, () => {
+      const { user } = req
+      if (user && (String(touite.author) === user.id)) {
+        return next()
+      }
+      return res.status(StatusCodes.FORBIDDEN).json("You must be the author to perform this action")
+    })
+  } catch (error) {
+
+  }
+
+}
 
 
 export {
+  verifyToken,
   verifyTokenAndAdmin,
-  verifyTokenAndAuthorization
+  verifyTokenAndAuthorization,
+  verifyTokenAndTouiteAuthorization
 };
 

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { getAllUsers, getOneUser, updateAllUsers, updateOneUser } from '../controllers/users.controllers'
-import { verifyTokenAndAdmin, verifyTokenAndAuthorization } from '../services/verifyToken'
+import { verifyTokenAndAdmin, verifyTokenAndAuthorization } from '../middlewares/verifyToken'
 
 const router = Router()
 

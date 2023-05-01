@@ -20,8 +20,8 @@ Connection: close
   "email": "titi@mail.fr",
   "username": "titi",
   "isAdmin": false,
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NGVkMTMwNDI3YjNiMGIyNjBiYWM5NyIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2ODI4ODc1MTIsImV4cCI6MTY4Mjk3MzkxMn0.2m6F0CYNC-D7RburZWErZ9cDIS1ug-EUpMWUtrSt2gM",
-  "exp": 1682973912
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NGVkMTMwNDI3YjNiMGIyNjBiYWM5NyIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2ODI5Nzk2MDcsImV4cCI6MTY4MzA2NjAwN30.ffwThGLVv-6BWtSw_DdpedHg0hvvHWl1AX0in_jRjqw",
+  "exp": 1683066007
 }
 
 {
@@ -29,6 +29,16 @@ Connection: close
   "email": "pierre@mail.fr",
   "username": "pierre",
   "isAdmin": false,
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NGVkMTJiNDI3YjNiMGIyNjBiYWM5NCIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2ODI4ODc1MjMsImV4cCI6MTY4Mjk3MzkyM30.lUSt7XXTAqqDOArhUOz8US5irilyWqkUBqwi83Rw5aY",
-  "exp": 1682973923
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NGVkMTJiNDI3YjNiMGIyNjBiYWM5NCIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2ODI5Nzk4ODksImV4cCI6MTY4MzA2NjI4OX0.hwz9yixEfv3Qnk9OpnOjYC1DTEbnWaOdF1cCwx3L6r4",
+  "exp": 1683066289
+}
+// Touite 
+
+{
+  "text": "Titi first touite after admin add verifyTokenAndTouiteAuthorization.",
+  "author": "644ed130427b3b0b260bac97",
+  "_id": "64503c264cc172028ee5b199",
+  "createdAt": "2023-05-01T22:24:38.735Z",
+  "updatedAt": "2023-05-01T22:24:38.735Z",
+  "__v": 0
 }

@@ -7,7 +7,7 @@ const addOneTouite = async function (req: Request<TouiteReqParams, {}, TouitePro
   try {
     const { text } = req.body
     const newTweet = new Touite({
-      author: req.params.userId,
+      author: req.params.id,
       text
     })
     const savedTweet = await newTweet.save()

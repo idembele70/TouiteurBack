@@ -1,13 +1,13 @@
 import { Router } from 'express'
 import { addOneTouite, deleteAllTouites, deleteOneTouite, getAllTouites, getOneTouite, updateOneTouite } from '../controllers/touites.controllers'
-import { verifyTokenAndAdmin, verifyTokenAndAuthorization } from '../services/verifyToken'
+import { verifyTokenAndAuthorization, verifyTokenAndAdmin, verifyTokenAndTouiteAuthorization } from '../middlewares/verifyToken'
 const touiteRouter = Router()
 
-touiteRouter.post("/new/:userId", verifyTokenAndAuthorization, addOneTouite)
-touiteRouter.delete("deleteOne/:id/:userId", verifyTokenAndAuthorization, deleteOneTouite)
-touiteRouter.put("/updateOne/:id/:userId", verifyTokenAndAuthorization, updateOneTouite)
-touiteRouter.get("/findOne/:id/:userId", verifyTokenAndAuthorization, getOneTouite)
-touiteRouter.get("/findAll/:userId", verifyTokenAndAuthorization, getAllTouites)
+touiteRouter.post("/new/:id", verifyTokenAndAuthorization, addOneTouite)
+touiteRouter.delete("/:id", verifyTokenAndTouiteAuthorization, deleteOneTouite)
+touiteRouter.put("/:id", verifyTokenAndTouiteAuthorization, updateOneTouite)
+touiteRouter.get("/:id", verifyTokenAndTouiteAuthorization, getOneTouite)
+touiteRouter.get("/", verifyTokenAndTouiteAuthorization, getAllTouites)
 touiteRouter.delete("/deleteAll/:userId", verifyTokenAndAdmin, deleteAllTouites)
 
 export default touiteRouter
