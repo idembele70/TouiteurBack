@@ -1,33 +1,34 @@
 ### To use it, you will need to install the "humao.rest-client" extension created by Huachao Mao.
 
 ### Add one touite
-POST http://localhost:5000/touites/new/644ed130427b3b0b260bac97
+POST http://localhost:5000/touites/new
 Authorization: bearear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NGVkMTMwNDI3YjNiMGIyNjBiYWM5NyIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2ODI5Nzk2MDcsImV4cCI6MTY4MzA2NjAwN30.ffwThGLVv-6BWtSw_DdpedHg0hvvHWl1AX0in_jRjqw
 Content-Type: application/json
 
 {
-  "text":"Titi first touite after admin add verifyTokenAndTouiteAuthorization."
+  "text":"Titi first touite after admin add verifyTokenAndTouiteAuthor"
 }
 
 ### Delete one touite
-DELETE  http://localhost:5000/touites/64503c264cc172028ee5b199
-Authorization: bearear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NGVkMTJiNDI3YjNiMGIyNjBiYWM5NCIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2ODI5Nzk4ODksImV4cCI6MTY4MzA2NjI4OX0.hwz9yixEfv3Qnk9OpnOjYC1DTEbnWaOdF1cCwx3L6r4
+DELETE  http://localhost:5000/touites/6451770b4d02048c455b40f4
+Authorization: bearear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NGVkMTMwNDI3YjNiMGIyNjBiYWM5NyIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2ODI5Nzk2MDcsImV4cCI6MTY4MzA2NjAwN30.ffwThGLVv-6BWtSw_DdpedHg0hvvHWl1AX0in_jRjqw
 
 ### Update one touite
-PUT http://localhost:5000/touites/
-Authorization: bearear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NDQ5MDI1Njc2Y2YxNTVmNjI3MGRjM2QiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNjgyODgyMTEwLCJleHAiOjE2ODI5Njg1MTB9.gP145KI8MZcQGS5yPhB2VN1SUXBF42smAms79g-liNM
+PUT http://localhost:5000/touites/6451770b4d02048c455b40f4
+Authorization: bearear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NGVkMTMwNDI3YjNiMGIyNjBiYWM5NyIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2ODI5Nzk2MDcsImV4cCI6MTY4MzA2NjAwN30.ffwThGLVv-6BWtSw_DdpedHg0hvvHWl1AX0in_jRjqw
 Content-Type: application/json
 
 {
-"text": "Hi, It's toto's second text updated !"
+"text": "Hi, It's toto's FIRST text updated !"
 }
 
 ### Get one touite
-Get http://localhost:5000/touites/
+Get http://localhost:5000/touites/6451770b4d02048c455b40f4
+Authorization: bearear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NGVkMTJiNDI3YjNiMGIyNjBiYWM5NCIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2ODI5Nzk4ODksImV4cCI6MTY4MzA2NjI4OX0.hwz9yixEfv3Qnk9OpnOjYC1DTEbnWaOdF1cCwx3L6r4
 
 ### Get all touites
-Get http://localhost:5000/touites/findAll/644ed1b568703df6e8b0cc53
-Authorization: bearear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NGVkMWI1Njg3MDNkZjZlOGIwY2M1MyIsImlzQWRtaW4iOnRydWUsImlhdCI6MTY4Mjg4NzQ5MCwiZXhwIjoxNjgyOTczODkwfQ.lBtRNuNhEcOFxJvvaeL30PUi-y3OALH8UEg_KmYlymM
+Get http://localhost:5000/touites/
+Authorization: bearear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NGVkMTMwNDI3YjNiMGIyNjBiYWM5NyIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2ODI5Nzk2MDcsImV4cCI6MTY4MzA2NjAwN30.ffwThGLVv-6BWtSw_DdpedHg0hvvHWl1AX0in_jRjqw
 
 ### Delete all touites
 

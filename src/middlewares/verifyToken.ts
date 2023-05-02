@@ -41,20 +41,31 @@ const verifyTokenAndAdmin = (req: Request, res: Response, next: NextFunction) =>
     return res.status(StatusCodes.FORBIDDEN).json("You must be an admin to perform this action")
   })
 }
-const verifyTokenAndTouiteAuthorization = async (req: Request, res: Response, next: NextFunction) => {
+const verifyTokenAndTouiteAuthor = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const touite = await Touite.findById(req.params.id)
     if (!touite)
-      return res.status(StatusCodes.NOT_FOUND).json("No tweet found in the DB.")
+      return res.status(StatusCodes.NOT_FOUND).json({
+        file: "middlewares/verifyToken/verifyTokenAndTouiteAuthor",
+        error: "Tweet not found"
+      })
     verifyToken(req, res, () => {
       const { user } = req
       if (user && (String(touite.author) === user.id)) {
         return next()
       }
-      return res.status(StatusCodes.FORBIDDEN).json("You must be the author to perform this action")
+      return res.status(StatusCodes.FORBIDDEN).json({
+        file: "middlewares/verifyToken/verifyTokenAndTouiteAuthor",
+        error: "You must be the author to perform this action"
+      })
     })
   } catch (error) {
-
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
+      {
+        file: "middlewares/verifyToken/verifyTouiteAuthor",
+        error
+      }
+    )
   }
 
 }
@@ -64,6 +75,6 @@ export {
   verifyToken,
   verifyTokenAndAdmin,
   verifyTokenAndAuthorization,
-  verifyTokenAndTouiteAuthorization
+  verifyTokenAndTouiteAuthor
 };
 
