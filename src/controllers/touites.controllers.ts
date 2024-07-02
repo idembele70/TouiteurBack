@@ -58,7 +58,6 @@ const updateOneTouite = async function (req: Request<TouiteReqParams, {}, Touite
   }
 }
 
-
 // Get one touite
 const getOneTouite = async function (req: Request<TouiteReqParams>, res: Response) {
   const { id } = req.params

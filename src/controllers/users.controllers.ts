@@ -73,6 +73,5 @@ const getAllUsers = async function (req: Request, res: Response) {
   }
 }
 
-
 export { getOneUser, updateOneUser, updateAllUsers, getAllUsers, };
 

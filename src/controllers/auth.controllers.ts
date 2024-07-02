@@ -42,7 +42,6 @@ const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
   }
 }
 
-
 // Login
 const login = async (req: Request<{}, {}, UserProps>, res: Response) => {
   const { PASSWORD_SECRET_KEY, JWT_SECRET_KEY } = process.env
@@ -81,6 +80,7 @@ const login = async (req: Request<{}, {}, UserProps>, res: Response) => {
     })
   }
 }
+
 const getUserByEmailOrUsername = ({ email, username }: { email?: string; username?: string }) => User.findOne(
   {
     $or: [{ email }, { username }]
