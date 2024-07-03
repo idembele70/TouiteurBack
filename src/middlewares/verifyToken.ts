@@ -21,7 +21,6 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
 
 }
 
-
 const verifyTokenAndAuthorization = (req: Request, res: Response, next: NextFunction) => {
   verifyToken(req, res, () => {
     const { user } = req
@@ -41,6 +40,7 @@ const verifyTokenAndAdmin = (req: Request, res: Response, next: NextFunction) =>
     return res.status(StatusCodes.FORBIDDEN).json("You must be an admin to perform this action")
   })
 }
+
 const verifyTokenAndTouiteAuthor = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const touite = await Touite.findById(req.params.id)
@@ -69,7 +69,6 @@ const verifyTokenAndTouiteAuthor = async (req: Request, res: Response, next: Nex
   }
 
 }
-
 
 export {
   verifyToken,

@@ -1,9 +1,8 @@
-import Touite, { TouiteProps } from '../database/models/touite.model';
-import { Request, Response } from "express"
-import User, { UserProps } from '../database/models/users.model';
-import jwt from 'jsonwebtoken'
-import CryptoJS from "crypto-js"
+import CryptoJS from "crypto-js";
+import { Request, Response } from "express";
 import { StatusCodes } from 'http-status-codes';
+import jwt from 'jsonwebtoken';
+import User, { UserProps } from '../database/models/users.model';
 
 
 // Register
@@ -91,4 +90,4 @@ const getUserByEmailOrUsername = ({ email, username }: { email?: string; usernam
 export {
   login,
   register
-}
+};
