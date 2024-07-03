@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import User, { UserProps } from '../database/models/users.model';
-
-import { ReqParams } from './touites.controllers';
 import { StatusCodes } from "http-status-codes";
 
+export interface ReqParams {
+  id?: string;
+}
 // Get a user 
 const getOneUser = async (req: Request<ReqParams>, res: Response) => {
   try {
