@@ -5,7 +5,9 @@
   "main": "./src/app.ts",
   "scripts": {
     "start": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "test": "jest"
+    "test:e2e": "npx playwright test",
+    "test:UT": "jest"
+
   },
   "author": "ibrahim dembele",
   "license": "MIT",
