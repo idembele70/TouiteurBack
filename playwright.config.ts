@@ -1,4 +1,5 @@
 import { PlaywrightTestConfig, devices } from '@playwright/test';
+import { baseURL } from './src/e2e/global_constant';
 
 /**
  * Read environment variables from file.
@@ -12,7 +13,7 @@ import { PlaywrightTestConfig, devices } from '@playwright/test';
  */
 
 const config: PlaywrightTestConfig = {
-  testDir: './e2e',
+  testDir: './src/e2e',
   timeout: 15 * 1000,
   /* Run tests in files in serial */
   fullyParallel: false,
@@ -26,23 +27,21 @@ const config: PlaywrightTestConfig = {
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI ? 'github' : 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
-  use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://127.0.0.1:5000',
-  },
 
   /* Configure projects for major browsers */
   projects: [
     {
       name: 'local',
-      use: { ...devices['Desktop Chrome'] },
-      
+      use: {
+        baseURL: baseURL.local,
+        ...devices['Desktop Chrome'],
+        headless:true,
+       },
     },
   ],
-
   webServer: {
     command: 'npm run start',
-    url: 'http://127.0.0.1:5000',
+    url: baseURL.local,
   },
 };
 
