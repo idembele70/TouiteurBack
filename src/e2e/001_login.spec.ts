@@ -24,7 +24,7 @@ test.describe('It should test user register API Endpoints', async ()=> {
     const response = await request.post("auth/register", {
       data: newUserCredentials
     })
-
+    console.log((await response.body()).toString())
     const responseJson = await response.json()
     expect(responseJson).toEqual({
        message: "Your account is created.", 

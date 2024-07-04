@@ -10,6 +10,7 @@ import { ObjectId } from "mongoose";
 const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
   const { PASSWORD_SECRET_KEY } = process.env
   try {
+    console.log("in")
     const { password,isAdmin, ...others } = req.body
     if(!others?.email) {
       res.status(StatusCodes.BAD_REQUEST).jsonp({
