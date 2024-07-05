@@ -10,21 +10,21 @@ import { ObjectId } from "mongoose";
 const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
   const { PASSWORD_SECRET_KEY } = process.env
   try {
-    const { password,isAdmin, ...others } = req.body
+    const { password, isAdmin, ...others } = req.body
     if(!others?.email) {
-      res.status(StatusCodes.BAD_REQUEST).jsonp({
+      res.status(StatusCodes.BAD_REQUEST).json({
         error: 'Email is required'
       })
       return 
     }
     if(!others?.username) {
-      res.status(StatusCodes.BAD_REQUEST).jsonp({
+      res.status(StatusCodes.BAD_REQUEST).json({
         error: 'Username is required'
       })
       return 
     }
     if(!password ) {
-      res.status(StatusCodes.BAD_REQUEST).jsonp({
+      res.status(StatusCodes.BAD_REQUEST).json({
         error: 'Password is required'
       })
       return 
@@ -55,9 +55,10 @@ const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
     res.status(StatusCodes.OK).json({ message: "Your account is created.", username: savedUser.username })
     return
   } catch (error) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       error
     })
+    return 
   }
 }
 

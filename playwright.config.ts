@@ -38,7 +38,6 @@ const config: PlaywrightTestConfig = {
         headless:true,
        },
     },
-
   ],
   webServer: {
     command: 'npm run start',

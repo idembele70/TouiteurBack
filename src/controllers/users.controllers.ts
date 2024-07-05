@@ -49,7 +49,6 @@ const updateOneUser = async function (req: Request<ReqParams, {}, UserProps>, re
 
 const deleteOneUser = async function (req:Request, res: Response) {
   const {username, email} = req.body as LoginCredentials
-  console.log('in')
   try {
     const deletedUser = await User.findOneAndDelete({
        $or: [{email}, {username}]
@@ -63,6 +62,7 @@ const deleteOneUser = async function (req:Request, res: Response) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       error
     })
+    return 
   }
 }
 

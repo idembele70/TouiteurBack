@@ -38,7 +38,7 @@ test.describe('It should test user register API Endpoints', async ()=> {
     })
     const responseJson = await response.json()
     expect(responseJson).toEqual({
-      error: `A user with that email already exists`
+      error: 'A user with that email already exists'
     })
     expect(response.status()).toEqual(StatusCodes.UNAUTHORIZED)
   })
@@ -107,7 +107,7 @@ async function getUserToken (request: APIRequestContext, loginCredentials: Parti
 }
 
 async function deleteUser (request: APIRequestContext, username: string, token:string) {
-  const response = await request.delete('users/delete', {
+  await request.delete('users/delete', {
     data: {
       username
     },
