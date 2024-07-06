@@ -46,10 +46,13 @@ const login = async (req: Request<{}, {}, UserProps>, res: Response) => {
   const { PASSWORD_SECRET_KEY, JWT_SECRET_KEY } = process.env
   try {
     const { password, ...emailOrUsername } = req.body
-    const user = await getUserByEmailOrUsername(emailOrUsername).select("+password")
+    let cryptedPassword:string;
+    const user = await getUserByEmailOrUsername(emailOrUsername)
+    console.log(user?.password)
+    if(user)
+      cryptedPassword = user.password
     if (!user) return res.status(StatusCodes.BAD_REQUEST).json({
-      file: "auth.controllers.ts/login",
-      error: `A user with that email or username doesn't exists`,
+      error: 'A user with that email or username doesn\'t exists',
     })
     const { password: DBPassword, isAdmin, username, email } = user
     const userPassword = CryptoJS.AES.decrypt(
@@ -57,8 +60,7 @@ const login = async (req: Request<{}, {}, UserProps>, res: Response) => {
     ).toString(CryptoJS.enc.Utf8)
     if (password !== userPassword)
       return res.status(StatusCodes.FORBIDDEN).json({
-        file: "auth.controllers.ts/login",
-        error: `Invalid password`,
+        error: 'Invalid password',
       })
     const accessToken = jwt.sign(
       { id: user._id, isAdmin }, JWT_SECRET_KEY, { expiresIn: "1d" }
@@ -74,7 +76,6 @@ const login = async (req: Request<{}, {}, UserProps>, res: Response) => {
     })
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      file: "auth.controllers.ts/login",
       error
     })
   }
