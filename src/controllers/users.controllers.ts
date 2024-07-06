@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import User, { UserProps } from '../database/models/users.model';
 import { StatusCodes } from "http-status-codes";
+import { LoginCredentials } from "./auth.controllers";
 
 export interface ReqParams {
   id?: string;
@@ -44,6 +45,27 @@ const updateOneUser = async function (req: Request<ReqParams, {}, UserProps>, re
   }
 }
 
+// Delete one user
+
+const deleteOneUser = async function (req:Request, res: Response) {
+  const {username, email} = req.body as LoginCredentials
+  try {
+    const deletedUser = await User.findOneAndDelete({
+       $or: [{email}, {username}]
+     })
+     console.log(deletedUser)
+     res.status(StatusCodes.OK).json(
+      deletedUser
+     )
+     return
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      error
+    })
+    return 
+  }
+}
+
 // Update field from all users
 const updateAllUsers = async function (req: Request<never, never, UserProps>, res: Response) {
   try {
@@ -74,5 +96,5 @@ const getAllUsers = async function (req: Request, res: Response) {
   }
 }
 
-export { getOneUser, updateOneUser, updateAllUsers, getAllUsers, };
+export { getOneUser, updateOneUser, deleteOneUser, updateAllUsers, getAllUsers, };
 

@@ -3,19 +3,39 @@ import { Request, Response } from "express";
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 import User, { UserProps } from '../database/models/users.model';
+import { ObjectId } from "mongoose";
 
 
 // Register
 const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
   const { PASSWORD_SECRET_KEY } = process.env
   try {
-    const { password, ...others } = req.body
+    const { password, isAdmin, ...others } = req.body
+    if(!others?.email) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        error: 'Email is required'
+      })
+      return 
+    }
+    if(!others?.username) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        error: 'Username is required'
+      })
+      return 
+    }
+    if(!password ) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        error: 'Password is required'
+      })
+      return 
+    }
     const existingUser = await getUserByEmailOrUsername(others)
-    if (existingUser)
-      return res.status(StatusCodes.UNAUTHORIZED).json(({
-        file: "auth.controllers.ts/register",
+    if (existingUser) {
+      res.status(StatusCodes.UNAUTHORIZED).json(({
         error: `A user with ${others.email === existingUser.email ? 'that email' : 'that username'} already exists`
       }))
+      return
+    }
 
     const cryptedPassword = CryptoJS.AES.encrypt(
       password, PASSWORD_SECRET_KEY
@@ -24,25 +44,35 @@ const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
       ...others, password: cryptedPassword
     })
     const savedUser = await newUser.save()
-    if (!savedUser)
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
+    if (!savedUser) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
         {
-          file: "auth.controllers.ts/register",
           message: "Error while trying to save the user"
         }
       )
-    return res.status(StatusCodes.OK).json({ message: "Your account is created.", username: savedUser.username })
+      return 
+    }
+    res.status(StatusCodes.OK).json({ message: "Your account is created.", username: savedUser.username })
+    return
   } catch (error) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      file: "auth.controllers.ts/register",
-      error,
-      message: "Catch block error"
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      error
     })
+    return 
   }
 }
 
 // Login
-const login = async (req: Request<{}, {}, UserProps>, res: Response) => {
+type LoginCredentials = Pick<UserProps, 'username' | 'email' | 'password'>
+interface LoggedUserCredentials {
+  id: ObjectId,
+  email: string,
+  username:string,
+  isAdmin:boolean,
+  accessToken:string,
+  exp:number
+}
+const login = async (req: Request<{}, {}, LoginCredentials>, res: Response) => {
   const { PASSWORD_SECRET_KEY, JWT_SECRET_KEY } = process.env
   try {
     const { password, ...emailOrUsername } = req.body
@@ -66,18 +96,21 @@ const login = async (req: Request<{}, {}, UserProps>, res: Response) => {
       { id: user._id, isAdmin }, JWT_SECRET_KEY, { expiresIn: "1d" }
     )
     const { exp } = jwt.decode(accessToken) as { exp: number }
-    return res.status(StatusCodes.OK).json({
+    const loggedUserCredentials: LoggedUserCredentials = {
       id: user._id,
       email,
       username,
       isAdmin,
       accessToken,
       exp
-    })
+    }
+    res.status(StatusCodes.OK).json(loggedUserCredentials)
+    return
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       error
     })
+    return
   }
 }
 
@@ -87,8 +120,10 @@ const getUserByEmailOrUsername = ({ email, username }: { email?: string; usernam
   }
 )
 
-
 export {
   login,
-  register
+  register,
+  LoginCredentials,
+  LoggedUserCredentials,
+  getUserByEmailOrUsername
 };

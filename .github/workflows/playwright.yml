@@ -9,7 +9,21 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - name: use current repos
+      uses: actions/checkout@v4
+
+    - name: pull environment variable
+      uses: actions/checkout@v4
+      with:
+        repository: idembele70/environment-variable
+        token: ${{secrets.MY_GH_PAT}}
+        path: src/config
+        sparse-checkout: |
+          touiteurBack/.env
+        sparse-checkout-cone-mode: false
+    - name: move .env inside src/config
+      run: |
+          mv src/config/touiteurBack/.env src/config
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
@@ -18,7 +32,7 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      run: npx playwright test
+      run: npm run test:e2e-local
     - uses: actions/upload-artifact@v4
       if: always()
       with:
