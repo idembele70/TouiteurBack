@@ -15,21 +15,21 @@ const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
       res.status(StatusCodes.BAD_REQUEST).json({
         error: 'Email is required'
       })
-      return 
+      return
     }
     if(!others?.username) {
       res.status(StatusCodes.BAD_REQUEST).json({
         error: 'Username is required'
       })
-      return 
+      return
     }
     if(!password ) {
       res.status(StatusCodes.BAD_REQUEST).json({
         error: 'Password is required'
       })
-      return 
+      return
     }
-    const existingUser = await getUserByEmailOrUsername(others)
+    const existingUser = await getUser(others)
     if (existingUser) {
       res.status(StatusCodes.UNAUTHORIZED).json(({
         error: `A user with ${others.email === existingUser.email ? 'that email' : 'that username'} already exists`
@@ -50,7 +50,7 @@ const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
           message: "Error while trying to save the user"
         }
       )
-      return 
+      return
     }
     res.status(StatusCodes.OK).json({ message: "Your account is created.", username: savedUser.username })
     return
@@ -58,12 +58,16 @@ const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       error
     })
-    return 
+    return
   }
 }
 
 // Login
-type LoginCredentials = Pick<UserProps, 'username' | 'email' | 'password'>
+interface LoginCredentials {
+  username: string;
+  email: string;
+  password: string;
+}
 interface LoggedUserCredentials {
   id: ObjectId,
   email: string,
@@ -76,19 +80,32 @@ const login = async (req: Request<{}, {}, LoginCredentials>, res: Response) => {
   const { PASSWORD_SECRET_KEY, JWT_SECRET_KEY } = process.env
   try {
     const { password, ...emailOrUsername } = req.body
-    let cryptedPassword:string;
-    const user = await getUserByEmailOrUsername(emailOrUsername)
-    console.log(user?.password)
-    if(user)
-      cryptedPassword = user.password
-    if (!user) return res.status(StatusCodes.BAD_REQUEST).json({
-      error: 'A user with that email or username doesn\'t exists',
-    })
-    const { password: DBPassword, isAdmin, username, email } = user
-    const userPassword = CryptoJS.AES.decrypt(
-      DBPassword, PASSWORD_SECRET_KEY
+    if(!emailOrUsername?.email && !emailOrUsername?.username) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        error: "An email or username is required"
+      })
+      return
+    }
+    if(!password) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        error: "An password is required"
+      })
+      return
+    }
+    // let user:any
+    const existingUser = await getUser(emailOrUsername)
+    if (!existingUser){
+      res.status(StatusCodes.BAD_REQUEST).json({
+       error: 'A user with that email or username doesn\'t exists',
+     })
+     return
+    } 
+    const user = await getUser(emailOrUsername).select('+password') as UserProps
+    const { password: cryptedPassword, isAdmin, username, email } = user
+    const decryptedPassword = CryptoJS.AES.decrypt(
+      cryptedPassword, PASSWORD_SECRET_KEY
     ).toString(CryptoJS.enc.Utf8)
-    if (password !== userPassword)
+    if (password !== decryptedPassword)
       return res.status(StatusCodes.FORBIDDEN).json({
         error: 'Invalid password',
       })
@@ -107,14 +124,17 @@ const login = async (req: Request<{}, {}, LoginCredentials>, res: Response) => {
     res.status(StatusCodes.OK).json(loggedUserCredentials)
     return
   } catch (error) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+   res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       error
     })
     return
   }
 }
-
-const getUserByEmailOrUsername = ({ email, username }: { email?: string; username?: string }) => User.findOne(
+interface GetUserParams {
+   email?: string;
+   username?: string;
+}
+const getUser = ({ email, username }: GetUserParams) => User.findOne(
   {
     $or: [{ email }, { username }]
   }
@@ -125,5 +145,5 @@ export {
   register,
   LoginCredentials,
   LoggedUserCredentials,
-  getUserByEmailOrUsername
+  getUser
 };
