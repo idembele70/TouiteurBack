@@ -5,11 +5,12 @@
   "main": "./src/app.ts",
   "scripts": {
     "start": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "test": "jest"
+    "test": "jest --detectOpenHandles"
   },
   "author": "ibrahim dembele",
   "license": "MIT",
   "devDependencies": {
+    "@jest-mock/express": "^2.1.0",
     "@jest/globals": "^29.7.0",
     "@playwright/test": "^1.45.1",
     "@types/compression": "^1.7.2",
