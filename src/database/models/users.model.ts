@@ -7,7 +7,6 @@ interface UserProps extends Document {
   email: string;
   password: string;
   isAdmin: boolean;
-
 }
 
 const UserSchema = new Schema<UserProps>({

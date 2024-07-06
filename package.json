@@ -6,11 +6,12 @@
   "scripts": {
     "start": "ts-node-dev --respawn --transpile-only src/app.ts",
     "test:e2e-local": "cross-env NODE_ENV=local npx playwright test --project=local",
-    "test:UT": "jest"
+    "test:ut": "jest --detectOpenHandles"
   },
   "author": "ibrahim dembele",
   "license": "MIT",
   "devDependencies": {
+    "@jest-mock/express": "^2.1.0",
     "@jest/globals": "^29.7.0",
     "@playwright/test": "^1.45.1",
     "@types/compression": "^1.7.2",
