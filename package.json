@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node-dev --respawn --transpile-only src/app.ts",
     "test:e2e-local": "cross-env NODE_ENV=local npx playwright test --project=local",
-    "test:UT": "jest --detectOpenHandles"
+    "test:ut": "jest --detectOpenHandles"
   },
   "author": "ibrahim dembele",
   "license": "MIT",
