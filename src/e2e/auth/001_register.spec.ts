@@ -1,7 +1,10 @@
-import { APIRequestContext, expect, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { StatusCodes } from 'http-status-codes';
-import { LoggedUserProps, LoginProps, RegisterProps } from '../controllers/auth.controllers';
-test.describe('It should test user register API Endpoints @auth', async ()=> {
+import { RegisterProps } from '../../controllers/auth.controllers';
+import { deleteUser, register } from '../helper';
+test.describe('It should test user register API Endpoints ', {
+  tag: '@auth @register'
+} ,async ()=> {
 
   const setupUserCredentials: RegisterProps = {
     username: 'setup_user',
@@ -13,19 +16,14 @@ test.describe('It should test user register API Endpoints @auth', async ()=> {
     email: 'test_registered_user@invalid.invalid',
     password: 'E{.X-A8UhV~()*mRpbjgDc',
   }
-  const adminCredentials: LoginProps = {
-    username: "admin",
-    password: 'admin'
-  }
 
   test.beforeAll( async( {request} ) => {
     await register(request, setupUserCredentials)
   })
 
   test.afterAll( async({request})=> {
-  const token = await getUserToken(request, adminCredentials)
-  setupUserCredentials.username && await deleteUser(request, setupUserCredentials.username, token)
-  newUserCredentials.username && await deleteUser(request, newUserCredentials.username, token)
+  await deleteUser(request, setupUserCredentials.username)
+  await deleteUser(request, newUserCredentials.username)
   })
 
   test('It should successfully register a new user', async ({request}) => {
@@ -105,28 +103,3 @@ test.describe('It should test user register API Endpoints @auth', async ()=> {
   })
 })
 
-async function register(request: APIRequestContext, data: RegisterProps) {
-  await request.post("auth/register", {
-    data
-  })
-}
-
-async function getUserToken (request: APIRequestContext, AuthProps: LoginProps) {
-  const reponse = await request.post('auth/login',{
-    data: AuthProps
-  })
-
-  const { accessToken } =  (await reponse.json()) as LoggedUserProps
-  return accessToken
-}
-
-async function deleteUser (request: APIRequestContext, username: string, token:string) {
-  await request.delete('users/delete', {
-    data: {
-      username
-    },
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
-}
