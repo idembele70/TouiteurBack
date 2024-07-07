@@ -1,23 +1,31 @@
 import { APIRequestContext, expect, test } from '@playwright/test';
 import { StatusCodes } from 'http-status-codes';
-import { LoggedUserCredentials, LoginCredentials } from '../controllers/auth.controllers';
+import { LoggedUserProps, LoginProps, RegisterProps } from '../controllers/auth.controllers';
 test.describe('It should test user register API Endpoints @auth', async ()=> {
 
-  test.describe.configure({mode:'serial'})
-
-  const newUserCredentials: LoginCredentials= {
+  const setupUserCredentials: RegisterProps = {
+    username: 'setup_user',
+    email: 'setup_user@invalid.invalid',
+    password: 'Setup_user_password',
+  }
+  const newUserCredentials: RegisterProps = {
     username: 'test_registered_user',
     email: 'test_registered_user@invalid.invalid',
     password: 'E{.X-A8UhV~()*mRpbjgDc',
   }
-  const adminCredentials: LoginCredentials = {
+  const adminCredentials: LoginProps = {
     username: "admin",
     password: 'admin'
   }
 
+  test.beforeAll( async( {request} ) => {
+    await register(request, setupUserCredentials)
+  })
+
   test.afterAll( async({request})=> {
   const token = await getUserToken(request, adminCredentials)
-  await deleteUser(request, newUserCredentials.username, token)
+  setupUserCredentials.username && await deleteUser(request, setupUserCredentials.username, token)
+  newUserCredentials.username && await deleteUser(request, newUserCredentials.username, token)
   })
 
   test('It should successfully register a new user', async ({request}) => {
@@ -34,7 +42,7 @@ test.describe('It should test user register API Endpoints @auth', async ()=> {
   
   test('It should not allow registration with an existing email', async ({request}) => {
     const response = await request.post("auth/register", {
-      data: {...newUserCredentials, username: "test_username"}
+      data: {...setupUserCredentials, username: "test_username"}
     })
     const responseJson = await response.json()
     expect(responseJson).toEqual({
@@ -45,7 +53,7 @@ test.describe('It should test user register API Endpoints @auth', async ()=> {
 
   test('It should not allow registration with an existing username', async ({request}) => {
     const response = await request.post("auth/register", {
-      data: {...newUserCredentials, email: "test_registered_user_second_email@invalid.invalid"}
+      data: {...setupUserCredentials, email: "test_registered_user_second_email@invalid.invalid"}
     })
     const responseJson = await response.json()
     expect(responseJson).toEqual({
@@ -55,7 +63,7 @@ test.describe('It should test user register API Endpoints @auth', async ()=> {
   })
 
   test('It should fail registering a new user without a username', async ({request}) => {
-    const credentialsWithoutUsername = {...newUserCredentials} as LoginCredentials
+    const credentialsWithoutUsername = {...setupUserCredentials} as Partial<RegisterProps>
     delete credentialsWithoutUsername.username
     const response = await request.post("auth/register", {
       data: credentialsWithoutUsername
@@ -69,7 +77,7 @@ test.describe('It should test user register API Endpoints @auth', async ()=> {
   })
 
   test('It should fail registering a new user without an email', async ({request}) => {
-    const credentialsWithoutEmail = {...newUserCredentials} as LoginCredentials
+    const credentialsWithoutEmail = {...setupUserCredentials} as Partial<RegisterProps>
     delete credentialsWithoutEmail.email
     const response = await request.post("auth/register", {
       data: credentialsWithoutEmail
@@ -83,7 +91,7 @@ test.describe('It should test user register API Endpoints @auth', async ()=> {
   })
 
   test('It should fail registering a new user without a password', async ({request}) => {
-    const credentialsWithoutPassword = {...newUserCredentials} as Partial<LoginCredentials>
+    const credentialsWithoutPassword = {...setupUserCredentials} as Partial<RegisterProps>
     delete credentialsWithoutPassword.password
     const response = await request.post("auth/register", {
       data: credentialsWithoutPassword
@@ -97,16 +105,22 @@ test.describe('It should test user register API Endpoints @auth', async ()=> {
   })
 })
 
-async function getUserToken (request: APIRequestContext, loginCredentials: LoginCredentials) {
+async function register(request: APIRequestContext, data: RegisterProps) {
+  await request.post("auth/register", {
+    data
+  })
+}
+
+async function getUserToken (request: APIRequestContext, AuthProps: LoginProps) {
   const reponse = await request.post('auth/login',{
-    data: loginCredentials
+    data: AuthProps
   })
 
-  const { accessToken } =  (await reponse.json()) as LoggedUserCredentials
+  const { accessToken } =  (await reponse.json()) as LoggedUserProps
   return accessToken
 }
 
-async function deleteUser (request: APIRequestContext, username: Pick<LoginCredentials, "username">, token:string) {
+async function deleteUser (request: APIRequestContext, username: string, token:string) {
   await request.delete('users/delete', {
     data: {
       username
