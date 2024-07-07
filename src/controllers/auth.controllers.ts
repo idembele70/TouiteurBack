@@ -63,7 +63,11 @@ const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
 }
 
 // Login
-type LoginCredentials = Pick<UserProps, 'username' | 'email' | 'password'>
+interface LoginCredentials   {
+  username?: string;
+  email?: string;
+  password: string;
+}
 interface LoggedUserCredentials {
   id: ObjectId,
   email: string,
