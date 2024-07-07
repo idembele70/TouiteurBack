@@ -2,7 +2,7 @@ import { APIRequestContext, expect, test } from '@playwright/test';
 import { StatusCodes } from 'http-status-codes';
 import { LoginCredentials } from '../controllers/auth.controllers';
 // '@' is a convention to tag tests
-test.describe('It should your describe description @your_test_identity', async ()=> {
+test.describe('It should your describe description @your_test_tags_name', async ()=> {
   // The mode can be serial or parallel depending on the link between the sub-tests
   test.describe.configure({mode:'serial'})
 
@@ -29,11 +29,9 @@ test.describe('It should your describe description @your_test_identity', async (
       data: { updatedUsername }
     })
     // assert your API controllers's returns
-    expect(response.status()).toEqual(StatusCodes.UNAUTHORIZED)
-    const responseJson = await response.json()
-    expect(responseJson).toEqual({
-      error: 'A user with that email already exists'
-    })
+    expect(response.status()).toEqual(StatusCodes.NOT_FOUND)
+    const responseBody = (await response.body()).toString()
+    expect(responseBody).toContain(`Cannot PUT /user/${userId}`)
   })
 })
 
