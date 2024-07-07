@@ -2,7 +2,9 @@ import { APIRequestContext, expect, test } from '@playwright/test';
 import { StatusCodes } from 'http-status-codes';
 import { LoginProps } from '../controllers/auth.controllers';
 // '@' is a convention to tag tests
-test.describe('It should your describe description @your_test_tags_name', async ()=> {
+test.describe('It should your describe description', {
+  tag: '@your_test_tag_name'
+} ,async ()=> {
   // The mode can be serial or parallel depending on the link between the sub-tests
   test.describe.configure({mode:'serial'})
 
