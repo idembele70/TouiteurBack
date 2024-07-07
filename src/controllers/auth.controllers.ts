@@ -2,15 +2,20 @@ import CryptoJS from "crypto-js";
 import { Request, Response } from "express";
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
-import User, { UserProps } from '../database/models/users.model';
 import { ObjectId } from "mongoose";
+import User from '../database/models/users.model';
 
 
 // Register
-const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
+interface RegisterProps {
+    username: string;
+    email: string;
+    password: string;
+}
+const register = async (req: Request, res: Response) => {
   const { PASSWORD_SECRET_KEY } = process.env
   try {
-    const { password, isAdmin, ...others } = req.body
+    const { password, ...others } = req.body as RegisterProps
     if(!others?.email) {
       res.status(StatusCodes.BAD_REQUEST).json({
         error: 'Email is required'
@@ -63,12 +68,12 @@ const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
 }
 
 // Login
-interface LoginCredentials   {
+interface LoginProps {
   username?: string;
   email?: string;
   password: string;
 }
-interface LoggedUserCredentials {
+interface LoggedUserProps {
   id: ObjectId,
   email: string,
   username:string,
@@ -76,10 +81,10 @@ interface LoggedUserCredentials {
   accessToken:string,
   exp:number
 }
-const login = async (req: Request<{}, {}, LoginCredentials>, res: Response) => {
+const login = async (req: Request, res: Response) => {
   const { PASSWORD_SECRET_KEY, JWT_SECRET_KEY } = process.env
   try {
-    const { password, ...emailOrUsername } = req.body
+    const { password, ...emailOrUsername } = req.body as LoginProps
     const user = await getUserByEmailOrUsername(emailOrUsername).select("+password")
     if (!user) return res.status(StatusCodes.BAD_REQUEST).json({
       file: "auth.controllers.ts/login",
@@ -98,7 +103,7 @@ const login = async (req: Request<{}, {}, LoginCredentials>, res: Response) => {
       { id: user._id, isAdmin }, JWT_SECRET_KEY, { expiresIn: "1d" }
     )
     const { exp } = jwt.decode(accessToken) as { exp: number }
-    const loggedUserCredentials: LoggedUserCredentials = {
+    const LoggedUserCredentials: LoggedUserProps = {
       id: user._id,
       email,
       username,
@@ -106,7 +111,7 @@ const login = async (req: Request<{}, {}, LoginCredentials>, res: Response) => {
       accessToken,
       exp
     }
-    res.status(StatusCodes.OK).json(loggedUserCredentials)
+    res.status(StatusCodes.OK).json(LoggedUserCredentials)
     return
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -124,9 +129,10 @@ const getUserByEmailOrUsername = ({ email, username }: { email?: string; usernam
 )
 
 export {
+  getUserByEmailOrUsername,
+  LoggedUserProps,
   login,
+  LoginProps,
   register,
-  LoginCredentials,
-  LoggedUserCredentials,
-  getUserByEmailOrUsername
+  RegisterProps
 };

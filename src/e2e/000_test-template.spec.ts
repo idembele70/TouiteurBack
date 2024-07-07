@@ -1,6 +1,6 @@
 import { APIRequestContext, expect, test } from '@playwright/test';
 import { StatusCodes } from 'http-status-codes';
-import { LoginCredentials } from '../controllers/auth.controllers';
+import { LoginProps } from '../controllers/auth.controllers';
 // '@' is a convention to tag tests
 test.describe('It should your describe description @your_test_tags_name', async ()=> {
   // The mode can be serial or parallel depending on the link between the sub-tests
@@ -35,7 +35,7 @@ test.describe('It should your describe description @your_test_tags_name', async 
   })
 })
 
-async function addUserSetupFunctionExample (request: APIRequestContext, data: LoginCredentials) {
+async function addUserSetupFunctionExample (request: APIRequestContext, data: LoginProps) {
   const token = "setup_function_token"
   await request.post('users/add', {
     data,
