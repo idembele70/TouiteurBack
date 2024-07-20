@@ -40,7 +40,7 @@ const config: PlaywrightTestConfig = {
     },
   ],
   webServer: {
-    command: 'npm run start',
+    command: 'npm run start:localhost',
     url: baseURL.local,
     reuseExistingServer: !process.env.CI,
   },
