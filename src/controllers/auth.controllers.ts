@@ -14,8 +14,14 @@ interface RegisterProps {
 }
 const register = async (req: Request, res: Response) => {
   const { PASSWORD_SECRET_KEY } = process.env
+  const { password, ...others } = req.body as RegisterProps
   try {
-    const { password, ...others } = req.body as RegisterProps
+    if(Object.keys(req.body).length === 0) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        error: 'Email, username & password are required'
+      })
+      return 
+    }
     if(!others?.email) {
       res.status(StatusCodes.BAD_REQUEST).json({
         error: 'Email is required'
@@ -85,6 +91,12 @@ const login = async (req: Request, res: Response) => {
   const { PASSWORD_SECRET_KEY, JWT_SECRET_KEY } = process.env
   const { password, ...emailOrUsername } = req.body as LoginProps
   try {
+    if(Object.keys(req.body).length === 0) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        error: 'Email or username with password are required'
+      })
+      return 
+    }
     if( !emailOrUsername?.email && !emailOrUsername?.username) {
       res.status(StatusCodes.BAD_REQUEST).json({
         error: 'Email or username is required'
