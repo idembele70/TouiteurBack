@@ -1,33 +1,38 @@
-import { APIRequestContext } from "@playwright/test"
+import { expect, request } from "@playwright/test"
+import { StatusCodes } from "http-status-codes"
 import { LoggedUserProps, LoginProps, RegisterProps } from "../controllers/auth.controllers"
 
-export async function register(request: APIRequestContext, data: RegisterProps) {
-  await request.post("auth/register", {
+export async function register(data: RegisterProps) {
+  const requestContext = await request.newContext()
+  await requestContext.post("auth/register", {
     data
   })
 }
 
-async function getUserToken (request: APIRequestContext, AuthProps: LoginProps) {
-  const reponse = await request.post('auth/login',{
-    data: AuthProps
+async function getUserToken (data: LoginProps) {
+  const requestContext = await request.newContext()
+  const reponse = await requestContext.post('auth/login',{
+    data
   })
-
-  const { accessToken } =  (await reponse.json()) as LoggedUserProps
+  const { accessToken} =  (await reponse.json()) as LoggedUserProps
   return accessToken
 }
 
-export async function deleteUser (request: APIRequestContext, username: string) {
+export async function deleteUser (username: string) {
+  const requestContext = await request.newContext()
   const adminCredentials: LoginProps = {
     username: "admin",
     password: 'admin'
   }
-  const token = await getUserToken(request, adminCredentials)
-  await request.delete('users/delete', {
+  const token = await getUserToken(adminCredentials)
+  const response = await requestContext.delete('users/delete', {
     data: {
       username
     },
     headers: {
-      Authorization: `Bearer ${token}`
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${token}`
     }
   })
+  expect(response.status()).toEqual(StatusCodes.OK)
 }
