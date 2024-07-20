@@ -83,22 +83,43 @@ interface LoggedUserProps {
 }
 const login = async (req: Request, res: Response) => {
   const { PASSWORD_SECRET_KEY, JWT_SECRET_KEY } = process.env
+  const { password, ...emailOrUsername } = req.body as LoginProps
   try {
-    const { password, ...emailOrUsername } = req.body as LoginProps
+    if( !emailOrUsername?.email && !emailOrUsername?.username) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        error: 'Email or username is required'
+      })
+      return 
+    }
+    if( !password ) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        error: 'Password is required'
+      })
+      return 
+    }
     const user = await getUserByEmailOrUsername(emailOrUsername).select("+password")
-    if (!user) return res.status(StatusCodes.BAD_REQUEST).json({
-      file: "auth.controllers.ts/login",
-      error: `A user with that email or username doesn't exists`,
-    })
+    if(!user) {
+      if(emailOrUsername?.email)
+        res.status(StatusCodes.BAD_REQUEST).json({
+          error: 'A user with that email doesn\'t exists',
+        })
+    
+      if(emailOrUsername?.username)
+        res.status(StatusCodes.BAD_REQUEST).json({
+          error: 'A user with that username doesn\'t exists',
+        })
+        return
+    }
     const { password: DBPassword, isAdmin, username, email } = user
     const userPassword = CryptoJS.AES.decrypt(
       DBPassword, PASSWORD_SECRET_KEY
     ).toString(CryptoJS.enc.Utf8)
-    if (password !== userPassword)
-      return res.status(StatusCodes.FORBIDDEN).json({
-        file: "auth.controllers.ts/login",
-        error: `Invalid password`,
+    if (password !== userPassword) {
+     res.status(StatusCodes.FORBIDDEN).json({
+        error: 'Invalid password',
       })
+     return
+    }
     const accessToken = jwt.sign(
       { id: user._id, isAdmin }, JWT_SECRET_KEY, { expiresIn: "1d" }
     )
@@ -115,7 +136,6 @@ const login = async (req: Request, res: Response) => {
     return
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      file: "auth.controllers.ts/login",
       error
     })
     return
