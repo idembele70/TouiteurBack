@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import User, { UserProps } from '../database/models/users.model';
 import { StatusCodes } from "http-status-codes";
-import { LoginCredentials } from "./auth.controllers";
+import { LoginProps } from "./auth.controllers";
 
 export interface ReqParams {
   id?: string;
@@ -48,12 +48,11 @@ const updateOneUser = async function (req: Request<ReqParams, {}, UserProps>, re
 // Delete one user
 
 const deleteOneUser = async function (req:Request, res: Response) {
-  const {username, email} = req.body as LoginCredentials
+  const {username, email} = req.body as LoginProps
   try {
     const deletedUser = await User.findOneAndDelete({
        $or: [{email}, {username}]
      })
-     console.log(deletedUser)
      res.status(StatusCodes.OK).json(
       deletedUser
      )

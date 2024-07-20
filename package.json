@@ -4,8 +4,8 @@
   "description": "The goal of this project is to create a Node.js server in TypeScript capable of managing the following functionalities: posting, reading, and deleting tweets, registering and authenticating users, as well as managing their profiles. The server should be able to store data in a database and ensure the security of transactions through encryption and authentication protocols. Unit and integration tests should be put in place to ensure the quality of the produced code.",
   "main": "./src/app.ts",
   "scripts": {
-    "start": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "test:e2e-local": "cross-env NODE_ENV=local npx playwright test --project=local",
+    "start:localhost": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "e2e-local": "cross-env NODE_ENV=local npx playwright test --project=local",
     "test:UT": "jest"
   },
   "author": "ibrahim dembele",

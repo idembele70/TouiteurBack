@@ -2,15 +2,26 @@ import CryptoJS from "crypto-js";
 import { Request, Response } from "express";
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
-import User, { UserProps } from '../database/models/users.model';
 import { ObjectId } from "mongoose";
+import User from '../database/models/users.model';
 
 
 // Register
-const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
+interface RegisterProps {
+    username: string;
+    email: string;
+    password: string;
+}
+const register = async (req: Request, res: Response) => {
   const { PASSWORD_SECRET_KEY } = process.env
+  const { password, ...others } = req.body as RegisterProps
   try {
-    const { password, isAdmin, ...others } = req.body
+    if(Object.keys(req.body).length === 0) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        error: 'Email, username & password are required'
+      })
+      return 
+    }
     if(!others?.email) {
       res.status(StatusCodes.BAD_REQUEST).json({
         error: 'Email is required'
@@ -63,8 +74,12 @@ const register = async (req: Request<{}, {}, UserProps>, res: Response) => {
 }
 
 // Login
-type LoginCredentials = Pick<UserProps, 'username' | 'email' | 'password'>
-interface LoggedUserCredentials {
+interface LoginProps {
+  username?: string;
+  email?: string;
+  password: string;
+}
+interface LoggedUserProps {
   id: ObjectId,
   email: string,
   username:string,
@@ -72,29 +87,56 @@ interface LoggedUserCredentials {
   accessToken:string,
   exp:number
 }
-const login = async (req: Request<{}, {}, LoginCredentials>, res: Response) => {
+const login = async (req: Request, res: Response) => {
   const { PASSWORD_SECRET_KEY, JWT_SECRET_KEY } = process.env
+  const { password, ...emailOrUsername } = req.body as LoginProps
   try {
-    const { password, ...emailOrUsername } = req.body
+    if(Object.keys(req.body).length === 0) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        error: 'Email or username with password are required'
+      })
+      return 
+    }
+    if( !emailOrUsername?.email && !emailOrUsername?.username) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        error: 'Email or username is required'
+      })
+      return 
+    }
+    if( !password ) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        error: 'Password is required'
+      })
+      return 
+    }
     const user = await getUserByEmailOrUsername(emailOrUsername).select("+password")
-    if (!user) return res.status(StatusCodes.BAD_REQUEST).json({
-      file: "auth.controllers.ts/login",
-      error: `A user with that email or username doesn't exists`,
-    })
+    if(!user) {
+      if(emailOrUsername?.email)
+        res.status(StatusCodes.BAD_REQUEST).json({
+          error: 'A user with that email doesn\'t exists',
+        })
+    
+      if(emailOrUsername?.username)
+        res.status(StatusCodes.BAD_REQUEST).json({
+          error: 'A user with that username doesn\'t exists',
+        })
+        return
+    }
     const { password: DBPassword, isAdmin, username, email } = user
     const userPassword = CryptoJS.AES.decrypt(
       DBPassword, PASSWORD_SECRET_KEY
     ).toString(CryptoJS.enc.Utf8)
-    if (password !== userPassword)
-      return res.status(StatusCodes.FORBIDDEN).json({
-        file: "auth.controllers.ts/login",
-        error: `Invalid password`,
+    if (password !== userPassword) {
+     res.status(StatusCodes.FORBIDDEN).json({
+        error: 'Invalid password',
       })
+     return
+    }
     const accessToken = jwt.sign(
       { id: user._id, isAdmin }, JWT_SECRET_KEY, { expiresIn: "1d" }
     )
     const { exp } = jwt.decode(accessToken) as { exp: number }
-    const loggedUserCredentials: LoggedUserCredentials = {
+    const LoggedUserCredentials: LoggedUserProps = {
       id: user._id,
       email,
       username,
@@ -102,11 +144,10 @@ const login = async (req: Request<{}, {}, LoginCredentials>, res: Response) => {
       accessToken,
       exp
     }
-    res.status(StatusCodes.OK).json(loggedUserCredentials)
+    res.status(StatusCodes.OK).json(LoggedUserCredentials)
     return
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      file: "auth.controllers.ts/login",
       error
     })
     return
@@ -120,9 +161,10 @@ const getUserByEmailOrUsername = ({ email, username }: { email?: string; usernam
 )
 
 export {
+  getUserByEmailOrUsername,
+  LoggedUserProps,
   login,
+  LoginProps,
   register,
-  LoginCredentials,
-  LoggedUserCredentials,
-  getUserByEmailOrUsername
+  RegisterProps
 };
