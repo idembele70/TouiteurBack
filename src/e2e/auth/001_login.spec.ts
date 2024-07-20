@@ -8,42 +8,34 @@ test.describe('It should test user login API endpoints', {
   // The mode can be serial or parallel depending on the link between the sub-tests
   test.describe.configure({mode:'serial'})
   const OneMillisecond = 1000
-  const userCredentials: RegisterProps = {
-    email: "test_setup_email@invalid.invalid",
-    username: "test_setup_username",
-    password: "test_setup_password"
-  }
-  const loginWithUsernameCredentials: LoginProps = {
-    username: "test_setup_username",
-    password: "test_setup_password"
-  }
-  const loginWithEmailCredentials: LoginProps = {
-    email: "test_setup_email@invalid.invalid",
-    password: "test_setup_password"
+  const userData: RegisterProps = {
+    email: "existing_user_login@invalid.invalid",
+    username: "existing_user_for_login",
+    password: "ExistingUserLoginPassword!2024"
   }
 
-
-  // Add your setup data
+  const {email, username, password} = userData;
+  // Add setup data
   test.beforeAll( async( )=> {
-    await register(userCredentials)
+    await register(userData)
   })
-  // Clean your setup data
+  // Clean setup data
   test.afterAll( async()=> {
-    await deleteUser(userCredentials.username)
+    await deleteUser(username)
   })
 
   test('It should sucessfully login a user using email', async ({ request }) => {
     const timestampBeforeLoginInSecond = Date.now() / OneMillisecond
     const response = await request.post('auth/login', {
-      data: loginWithEmailCredentials
+      data: {email, password}
     })
 
     expect(response.status()).toEqual(StatusCodes.OK)
     const responseJson = await response.json() as LoggedUserProps
     expect(responseJson.exp).toBeGreaterThan(timestampBeforeLoginInSecond)
     expect(responseJson).toEqual(expect.objectContaining({
-      email: userCredentials.email,
-      username: userCredentials.username,
+      email,
+      username,
       isAdmin:false,
     }))
   })
@@ -51,14 +43,14 @@ test.describe('It should test user login API endpoints', {
   test('It should sucessfully login a user using username', async ({ request }) => {
     const timestampBeforeLoginInSecond = Date.now() / OneMillisecond
     const response = await request.post('auth/login', {
-      data: loginWithUsernameCredentials
+      data: {username, password}
     })
     expect(response.status()).toEqual(StatusCodes.OK)
     const responseJson = await response.json() as LoggedUserProps
     expect(responseJson.exp).toBeGreaterThan(timestampBeforeLoginInSecond)
     expect(responseJson).toEqual(expect.objectContaining({
-      email: userCredentials.email,
-      username: userCredentials.username,
+      email,
+      username,
       isAdmin:false,
     }))
   })
@@ -66,8 +58,8 @@ test.describe('It should test user login API endpoints', {
   test('It should fail to login a user with an incorrect password', async ({ request }) => {
     const response = await request.post('auth/login', {
       data: {
-        email: loginWithEmailCredentials.email,
-        password: "incorrect_Password"
+        email,
+        password: "Invalid_Password!?-2024"
       }
     })
     expect(response.status()).toEqual(StatusCodes.FORBIDDEN)
@@ -80,7 +72,7 @@ test.describe('It should test user login API endpoints', {
   test('It should fail to login a user with providing only username', async ({ request }) => {
     const response = await request.post('auth/login', {
       data: {
-        username: loginWithUsernameCredentials.username
+        username
       }
     })
     expect(response.status()).toEqual(StatusCodes.BAD_REQUEST)
@@ -92,9 +84,7 @@ test.describe('It should test user login API endpoints', {
 
   test('It should fail to login a user with providing only email', async ({ request }) => {
     const response = await request.post('auth/login', {
-      data: {
-        email: loginWithEmailCredentials.email
-      }
+      data: { email }
     })
     expect(response.status()).toEqual(StatusCodes.BAD_REQUEST)
     const responseJson = await response.json() as LoggedUserProps
@@ -105,9 +95,7 @@ test.describe('It should test user login API endpoints', {
 
   test('It should fail to login a user with providing only password', async ({ request }) => {
     const response = await request.post('auth/login', {
-      data: {
-        password: loginWithEmailCredentials.password
-      }
+      data: {password}
     })
     expect(response.status()).toEqual(StatusCodes.BAD_REQUEST)
     const responseJson = await response.json() as LoggedUserProps
@@ -119,8 +107,8 @@ test.describe('It should test user login API endpoints', {
   test('It should fail to login a username that doesn\'t exist', async ({ request }) => {
     const response = await request.post('auth/login', {
       data: {
-        username: 'unexisting_user',
-        password: loginWithEmailCredentials.password
+        username: 'unexisting_username',
+        password
       }
     })
     expect(response.status()).toEqual(StatusCodes.BAD_REQUEST)
@@ -133,8 +121,8 @@ test.describe('It should test user login API endpoints', {
   test('It should fail to login a email that doesn\'t exist', async ({ request }) => {
     const response = await request.post('auth/login', {
       data: {
-        email: 'existing_user@invalid.invalid',
-        password: loginWithEmailCredentials.password
+        email: 'existing_user_email@invalid.invalid',
+        password
       }
     })
     expect(response.status()).toEqual(StatusCodes.BAD_REQUEST)
@@ -147,8 +135,8 @@ test.describe('It should test user login API endpoints', {
   test('It should fail to login a user using a good username but a wrong password', async ({request})=> {
     const response = await request.post('auth/login', {
       data: {
-        username: loginWithUsernameCredentials.username,
-        password: 'invalid_password_125478'
+        username,
+        password: 'invalid_password_12!?5478'
       }
     })
     expect(response.status()).toEqual(StatusCodes.FORBIDDEN)
@@ -161,14 +149,25 @@ test.describe('It should test user login API endpoints', {
   test('It should fail to login a user using a good email but a wrong password', async ({request})=> {
     const response = await request.post('auth/login', {
       data: {
-        email: loginWithEmailCredentials.email,
-        password: 'invalid_password_125478'
+        email,
+        password: 'invalid_password_?!:_125478'
       }
     })
     expect(response.status()).toEqual(StatusCodes.FORBIDDEN)
     const responseJson = await response.json() as LoggedUserProps
     expect(responseJson).toEqual({
       error: 'Invalid password',
+    })
+  })
+  
+  test('It should fail to login a user without providing data', async ({request})=> {
+    const response = await request.post('auth/login', {
+      data: {}
+    })
+    expect(response.status()).toEqual(StatusCodes.BAD_REQUEST)
+    const responseJson = await response.json() as LoggedUserProps
+    expect(responseJson).toEqual({
+     error: 'Email or username with password are required'
     })
   })
 })
