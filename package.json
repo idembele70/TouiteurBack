@@ -8,14 +8,14 @@
     "start-build:localhost": "nodemon",
     "e2e-local": "cross-env NODE_ENV=localhost npx playwright test --project=local",
     "test:UT": "jest",
-    "build": "tsc"
+    "build": "ts-node src/build.ts"
   },
   "nodemonConfig": {
     "watch": [
       "src"
     ],
     "ext": "ts",
-    "exec": "tsc && cross-env NODE_ENV=localhost node build/app.js"
+    "exec": "npm run build && cross-env NODE_ENV=localhost node build/app.js"
   },
   "author": "ibrahim dembele",
   "license": "MIT",
