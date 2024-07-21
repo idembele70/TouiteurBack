@@ -6,7 +6,8 @@
   "scripts": {
     "start:localhost": "ts-node-dev --respawn --transpile-only src/app.ts",
     "e2e-local": "cross-env NODE_ENV=local npx playwright test --project=local",
-    "test:UT": "jest"
+    "test:UT": "jest",
+    "build": "tsc"
   },
   "author": "ibrahim dembele",
   "license": "MIT",
