@@ -1,15 +1,15 @@
 import { resolve } from 'path'
-import dotenv from 'dotenv'
-// dotEnv Config
-dotenv.config({
-  path: resolve(__dirname, "config", ".env")
-})
-import express from 'express'
-import router from './routing'
-import cors from "cors"
-import cookieparser from 'cookie-parser'
+import dotenvFlow from 'dotenv-flow'
+// dotenvflow Config
+dotenvFlow.config({
+  path: resolve('env')
+}) 
 import compression from 'compression'
+import cookieparser from 'cookie-parser'
+import cors from "cors"
+import express from 'express'
 import "./database"
+import router from './routing'
 const { PORT } = process.env
 
 const app = express()
@@ -31,6 +31,6 @@ app.use(express.json())
   )
 
 
-app.listen(PORT || 5000, () => {
+  app.listen(PORT || 5000, () => {
   console.log("Backend server is running! on port: %d", PORT || 5000)
 })
